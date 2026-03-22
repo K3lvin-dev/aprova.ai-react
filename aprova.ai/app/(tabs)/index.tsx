@@ -1,8 +1,8 @@
 import { View, StyleSheet, ScrollView } from 'react-native';
-import { Text, Card, useTheme } from 'react-native-paper';
+import { Text, Button, useTheme } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import Animated, { FadeInDown } from 'react-native-reanimated';
+import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 
 type ConcursoVariant = 'primary' | 'tertiary';
@@ -22,7 +22,7 @@ const CONCURSOS: Concurso[] = [
   {
     id: 'pf',
     sigla: 'PF',
-    nome: 'Policia Federal',
+    nome: 'Polícia Federal',
     cargo: 'Agente Administrativo',
     banca: 'CEBRASPE',
     vagas: '1.500 vagas',
@@ -33,7 +33,7 @@ const CONCURSOS: Concurso[] = [
     id: 'inss',
     sigla: 'INSS',
     nome: 'Seg. Social',
-    cargo: 'Tecnico do Seguro Social',
+    cargo: 'Técnico do Seguro Social',
     banca: 'CEBRASPE',
     vagas: '7.500 vagas',
     icon: '🏛️',
@@ -44,15 +44,21 @@ const CONCURSOS: Concurso[] = [
 function ConcursoCard({ concurso, index }: { concurso: Concurso; index: number }) {
   const theme = useTheme();
 
-  const containerBg =
-    concurso.variant === 'primary' ? theme.colors.primaryContainer : theme.colors.tertiaryContainer;
+  const isPrimary = concurso.variant === 'primary';
 
-  const onContainerColor =
-    concurso.variant === 'primary'
-      ? theme.colors.onPrimaryContainer
-      : theme.colors.onTertiaryContainer;
+  // Camada 1 — hero sólido saturado
+  const heroColor = isPrimary ? theme.colors.primary : theme.colors.tertiary;
+  const onHeroColor = isPrimary ? theme.colors.onPrimary : theme.colors.onTertiary;
 
-  const accentColor = concurso.variant === 'primary' ? theme.colors.primary : theme.colors.tertiary;
+  // Camada 2 — body tinted container
+  const containerBg = isPrimary ? theme.colors.primaryContainer : theme.colors.tertiaryContainer;
+  const onContainer = isPrimary
+    ? theme.colors.onPrimaryContainer
+    : theme.colors.onTertiaryContainer;
+
+  // Camada 3 — meta chips tintados com a cor do card
+  const chipBg = heroColor + '28';
+  const onChip = onContainer;
 
   const handlePress = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -61,54 +67,48 @@ function ConcursoCard({ concurso, index }: { concurso: Concurso; index: number }
   };
 
   return (
-    <Animated.View entering={FadeInDown.delay(index * 120).springify()}>
-      <Card
-        mode="contained"
-        style={[styles.card, { backgroundColor: containerBg }]}
-        onPress={handlePress}>
-        <Card.Content style={styles.cardContent}>
-          <View style={styles.cardLeft}>
-            <View style={[styles.siglaBadge, { borderColor: accentColor + '55' }]}>
-              <Text variant="labelMedium" style={{ color: accentColor, letterSpacing: 1 }}>
-                {concurso.sigla}
+    <Animated.View entering={FadeInDown.delay(index * 140).springify()}>
+      <View style={[styles.card, { backgroundColor: containerBg }]}>
+        {/* Camada 1: hero sólido */}
+        <View style={[styles.heroArea, { backgroundColor: heroColor }]}>
+          <Text style={[styles.watermark, { color: onHeroColor }]}>{concurso.sigla}</Text>
+          <Text style={styles.heroIcon}>{concurso.icon}</Text>
+        </View>
+
+        {/* Camada 2: body container */}
+        <View style={styles.cardBody}>
+          <Text variant="headlineSmall" style={[styles.cardNome, { color: onContainer }]}>
+            {concurso.nome}
+          </Text>
+          <Text variant="bodyMedium" style={{ color: onContainer, opacity: 0.7, marginTop: 2 }}>
+            {concurso.cargo}
+          </Text>
+
+          {/* Camada 3: meta chips em secondaryContainer */}
+          <View style={styles.chipsRow}>
+            <View style={[styles.chip, { backgroundColor: chipBg }]}>
+              <Text variant="labelSmall" style={{ color: onChip }}>
+                {concurso.banca}
               </Text>
             </View>
-            <Text style={styles.cardIcon}>{concurso.icon}</Text>
-          </View>
-
-          <View style={styles.cardRight}>
-            <Text variant="titleLarge" style={[styles.cardNome, { color: onContainerColor }]}>
-              {concurso.nome}
-            </Text>
-            <Text
-              variant="bodySmall"
-              style={{ color: onContainerColor, opacity: 0.7, marginTop: 2 }}>
-              {concurso.cargo}
-            </Text>
-
-            <View style={styles.cardMeta}>
-              <View style={styles.metaTag}>
-                <View style={[styles.metaDot, { backgroundColor: accentColor }]} />
-                <Text variant="labelSmall" style={{ color: onContainerColor, opacity: 0.7 }}>
-                  {concurso.banca}
-                </Text>
-              </View>
-              <View style={styles.metaTag}>
-                <View style={[styles.metaDot, { backgroundColor: accentColor }]} />
-                <Text variant="labelSmall" style={{ color: onContainerColor, opacity: 0.7 }}>
-                  {concurso.vagas}
-                </Text>
-              </View>
-            </View>
-
-            <View style={styles.ctaRow}>
-              <Text variant="labelLarge" style={{ color: accentColor }}>
-                Gerar minha trilha
+            <View style={[styles.chip, { backgroundColor: chipBg }]}>
+              <Text variant="labelSmall" style={{ color: onChip }}>
+                {concurso.vagas}
               </Text>
             </View>
           </View>
-        </Card.Content>
-      </Card>
+
+          <Button
+            mode="contained"
+            onPress={handlePress}
+            buttonColor={heroColor}
+            textColor={onHeroColor}
+            style={styles.ctaButton}
+            contentStyle={styles.ctaButtonContent}>
+            Gerar minha trilha
+          </Button>
+        </View>
+      </View>
     </Animated.View>
   );
 }
@@ -121,19 +121,19 @@ export default function ConcursosScreen() {
     <View
       style={[styles.screen, { backgroundColor: theme.colors.background, paddingTop: insets.top }]}>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        <Animated.View entering={FadeInDown.delay(0).springify()} style={styles.header}>
-          <Text variant="labelMedium" style={[styles.brandLabel, { color: theme.colors.primary }]}>
+        <Animated.View entering={FadeInUp.delay(0).springify()} style={styles.header}>
+          <Text variant="labelLarge" style={[styles.brandLabel, { color: theme.colors.primary }]}>
             APROVA.AI
           </Text>
           <Text
-            variant="headlineLarge"
+            variant="displaySmall"
             style={[styles.headline, { color: theme.colors.onBackground }]}>
-            Qual concurso{'\n'}voce vai passar?
+            Qual concurso você vai passar?
           </Text>
           <Text
-            variant="bodyMedium"
-            style={[styles.subheadline, { color: theme.colors.onSurfaceVariant }]}>
-            Geramos sua trilha de estudos personalizada a partir do edital oficial.
+            variant="bodyLarge"
+            style={{ color: theme.colors.onSurfaceVariant, lineHeight: 24 }}>
+            Trilha de estudos gerada a partir do edital oficial.
           </Text>
         </Animated.View>
 
@@ -143,8 +143,8 @@ export default function ConcursosScreen() {
           ))}
         </View>
 
-        <Animated.View entering={FadeInDown.delay(400).springify()} style={styles.footer}>
-          <View style={[styles.footerDivider, { backgroundColor: theme.colors.outline }]} />
+        <Animated.View entering={FadeInDown.delay(500).springify()} style={styles.footer}>
+          <View style={[styles.footerDivider, { backgroundColor: theme.colors.outlineVariant }]} />
           <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>
             Mais concursos chegando em breve
           </Text>
@@ -163,78 +163,74 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   header: {
-    paddingTop: 32,
-    paddingBottom: 28,
-    gap: 8,
+    paddingTop: 40,
+    paddingBottom: 32,
+    gap: 10,
   },
   brandLabel: {
-    letterSpacing: 2,
+    letterSpacing: 3,
     marginBottom: 4,
   },
   headline: {
     fontFamily: 'Nunito_800ExtraBold',
-    lineHeight: 40,
-  },
-  subheadline: {
-    lineHeight: 20,
-    marginTop: 4,
+    lineHeight: 44,
   },
   list: {
-    gap: 12,
-  },
-  card: {
-    borderRadius: 16,
-  },
-  cardContent: {
-    flexDirection: 'row',
     gap: 16,
-    paddingVertical: 20,
-    minHeight: 140,
   },
-  cardLeft: {
+
+  // Card
+  card: {
+    borderRadius: 28,
+    overflow: 'hidden',
+  },
+  heroArea: {
+    height: 140,
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 4,
+    justifyContent: 'center',
+    overflow: 'hidden',
   },
-  siglaBadge: {
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+  watermark: {
+    position: 'absolute',
+    fontSize: 130,
+    fontFamily: 'Nunito_800ExtraBold',
+    opacity: 0.07,
+    right: -8,
+    bottom: -24,
+    letterSpacing: -4,
   },
-  cardIcon: {
-    fontSize: 36,
+  heroIcon: {
+    fontSize: 64,
   },
-  cardRight: {
-    flex: 1,
-    justifyContent: 'space-between',
-    paddingVertical: 4,
+  cardBody: {
+    padding: 20,
+    paddingTop: 18,
+    gap: 14,
   },
   cardNome: {
     fontFamily: 'Nunito_800ExtraBold',
   },
-  cardMeta: {
+  chipsRow: {
     flexDirection: 'row',
-    gap: 12,
-    marginTop: 8,
+    gap: 8,
+    marginTop: 2,
   },
-  metaTag: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
+  chip: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
   },
-  metaDot: {
-    width: 5,
-    height: 5,
-    borderRadius: 3,
+  ctaButton: {
+    borderRadius: 20,
+    marginTop: 2,
   },
-  ctaRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 12,
+  ctaButtonContent: {
+    paddingVertical: 6,
   },
+
+  // Footer
   footer: {
-    marginTop: 32,
+    marginTop: 36,
     alignItems: 'center',
     gap: 12,
   },
