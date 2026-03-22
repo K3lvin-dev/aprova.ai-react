@@ -14,6 +14,18 @@ import { initSuperTokens } from '@/lib/supertokens';
 initSuperTokens();
 SplashScreen.preventAutoHideAsync();
 
+const APP_BG = '#0B0B14';
+
+const navLightTheme = {
+  ...DefaultTheme,
+  colors: { ...DefaultTheme.colors, background: APP_BG },
+};
+
+const navDarkTheme = {
+  ...DarkTheme,
+  colors: { ...DarkTheme.colors, background: APP_BG },
+};
+
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
@@ -28,9 +40,9 @@ export default function RootLayout() {
 
   return (
     <PaperProvider theme={isDark ? darkTheme : lightTheme}>
-      <ThemeProvider value={isDark ? DarkTheme : DefaultTheme}>
-        <Stack screenOptions={{ headerShown: false }} />
-        <StatusBar style="auto" />
+      <ThemeProvider value={isDark ? navDarkTheme : navLightTheme}>
+        <Stack screenOptions={{ headerShown: false, animation: 'fade', contentStyle: { backgroundColor: APP_BG } }} />
+        <StatusBar style="light" />
       </ThemeProvider>
     </PaperProvider>
   );

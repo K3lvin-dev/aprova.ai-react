@@ -1,15 +1,13 @@
 import { View, StyleSheet } from 'react-native';
 import { Image } from 'expo-image';
-import { Text, useTheme } from 'react-native-paper';
+import { Text } from 'react-native-paper';
 
 export function AuthHero() {
-  const theme = useTheme();
-
   return (
-    <View style={[styles.hero, { backgroundColor: theme.colors.primary }]}>
+    <View style={styles.hero}>
       <Image source={require('@/assets/images/logo.svg')} style={styles.logo} />
-      <Text style={[styles.brand, { color: theme.colors.onPrimary }]}>
-        aprova.AI
+      <Text style={styles.brand}>
+        APROVA.AI
       </Text>
     </View>
   );
@@ -19,7 +17,8 @@ const styles = StyleSheet.create({
   hero: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 20,
+    paddingTop: 64,
+    paddingBottom: 0,
     paddingHorizontal: 24,
     gap: 4,
   },
@@ -30,7 +29,9 @@ const styles = StyleSheet.create({
   },
   brand: {
     fontFamily: 'Nunito_800ExtraBold',
-    fontSize: 32,
-    letterSpacing: 0.5,
+    fontSize: 30,
+    letterSpacing: 2,
+    color: '#6750A4',
+    textTransform: 'uppercase',
   },
 });

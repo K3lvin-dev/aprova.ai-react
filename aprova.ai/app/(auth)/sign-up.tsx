@@ -46,7 +46,7 @@ export default function SignUpScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={styles.flex}
+      style={[styles.flex, styles.screen]}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <ScrollView
@@ -201,6 +201,7 @@ export default function SignUpScreen() {
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
+  screen: { backgroundColor: '#0B0B14' },
   scroll: { flexGrow: 1 },
   body: {
     flex: 1,

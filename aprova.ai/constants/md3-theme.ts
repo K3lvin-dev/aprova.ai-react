@@ -13,6 +13,7 @@ const palette = {
   onTertiary: '#FFFFFF',
   tertiaryContainer: '#FFD8E4',
   onTertiaryContainer: '#31111D',
+  dark: 'dark'
 };
 
 export const lightTheme = {
