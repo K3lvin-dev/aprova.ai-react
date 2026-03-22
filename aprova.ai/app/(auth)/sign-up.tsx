@@ -24,11 +24,11 @@ export default function SignUpScreen() {
   const password = watch('password');
   const theme = useTheme();
 
-  const onSubmit = async ({ email, password }: FormData) => {
+  const onSubmit = async ({ email, password, name }: FormData) => {
     setLoading(true);
     setApiError('');
     try {
-      const response = await authApi.signUp(email, password);
+      const response = await authApi.signUp(email, password, name);
       if (response.status === 'OK') {
         router.replace('/');
       } else if (response.status === 'FIELD_ERROR') {
