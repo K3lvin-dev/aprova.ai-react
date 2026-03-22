@@ -1,29 +1,33 @@
-import { View, StyleSheet, Pressable, ScrollView } from 'react-native';
-import { Text } from 'react-native-paper';
+import { View, StyleSheet, ScrollView } from 'react-native';
+import { Text, Card, useTheme } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import Animated, {
-  FadeInDown,
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-} from 'react-native-reanimated';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 
-const CONCURSOS = [
+type ConcursoVariant = 'primary' | 'tertiary';
+
+type Concurso = {
+  id: string;
+  sigla: string;
+  nome: string;
+  cargo: string;
+  banca: string;
+  vagas: string;
+  icon: string;
+  variant: ConcursoVariant;
+};
+
+const CONCURSOS: Concurso[] = [
   {
     id: 'pf',
     sigla: 'PF',
     nome: 'Policia Federal',
     cargo: 'Agente Administrativo',
     banca: 'CEBRASPE',
-    ano: '2024',
     vagas: '1.500 vagas',
     icon: '🦅',
-    cardBg: '#1A1035',
-    accentColor: '#9C6FFF',
-    dotColor: '#7C4DFF',
-    available: true,
+    variant: 'primary',
   },
   {
     id: 'inss',
@@ -31,111 +35,104 @@ const CONCURSOS = [
     nome: 'Seg. Social',
     cargo: 'Tecnico do Seguro Social',
     banca: 'CEBRASPE',
-    ano: '2024',
     vagas: '7.500 vagas',
     icon: '🏛️',
-    cardBg: '#0B2240',
-    accentColor: '#29B6D4',
-    dotColor: '#00ACC1',
-    available: true,
+    variant: 'tertiary',
   },
 ];
 
-function ConcursoCard({
-  concurso,
-  index,
-}: {
-  concurso: (typeof CONCURSOS)[number];
-  index: number;
-}) {
-  const scale = useSharedValue(1);
+function ConcursoCard({ concurso, index }: { concurso: Concurso; index: number }) {
+  const theme = useTheme();
 
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
+  const containerBg =
+    concurso.variant === 'primary' ? theme.colors.primaryContainer : theme.colors.tertiaryContainer;
 
-  const handlePressIn = () => {
-    scale.value = withSpring(0.97, { damping: 20, stiffness: 300 });
-  };
+  const onContainerColor =
+    concurso.variant === 'primary'
+      ? theme.colors.onPrimaryContainer
+      : theme.colors.onTertiaryContainer;
 
-  const handlePressOut = () => {
-    scale.value = withSpring(1, { damping: 20, stiffness: 300 });
-  };
+  const accentColor = concurso.variant === 'primary' ? theme.colors.primary : theme.colors.tertiary;
 
   const handlePress = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    router.push(`/(tabs)/trilha-loading?concursoId=${concurso.id}`);
+    // TODO: criar tela /(tabs)/trilha-loading
+    router.push(`/(tabs)/trilha-loading?concursoId=${concurso.id}` as never);
   };
 
   return (
     <Animated.View entering={FadeInDown.delay(index * 120).springify()}>
-      <Animated.View style={animatedStyle}>
-        <Pressable
-          onPressIn={handlePressIn}
-          onPressOut={handlePressOut}
-          onPress={handlePress}
-          style={[styles.card, { backgroundColor: concurso.cardBg }]}
-        >
-          {/* Decorative blob */}
-          <View
-            style={[styles.blob, { backgroundColor: concurso.accentColor + '22' }]}
-          />
+      <Card
+        mode="contained"
+        style={[styles.card, { backgroundColor: containerBg }]}
+        onPress={handlePress}>
+        <Card.Content style={styles.cardContent}>
+          <View style={styles.cardLeft}>
+            <View style={[styles.siglaBadge, { borderColor: accentColor + '55' }]}>
+              <Text variant="labelMedium" style={{ color: accentColor, letterSpacing: 1 }}>
+                {concurso.sigla}
+              </Text>
+            </View>
+            <Text style={styles.cardIcon}>{concurso.icon}</Text>
+          </View>
 
-          {/* Accent line */}
-          <View style={[styles.accentLine, { backgroundColor: concurso.accentColor }]} />
+          <View style={styles.cardRight}>
+            <Text variant="titleLarge" style={[styles.cardNome, { color: onContainerColor }]}>
+              {concurso.nome}
+            </Text>
+            <Text
+              variant="bodySmall"
+              style={{ color: onContainerColor, opacity: 0.7, marginTop: 2 }}>
+              {concurso.cargo}
+            </Text>
 
-          <View style={styles.cardContent}>
-            <View style={styles.cardLeft}>
-              <View style={[styles.siglaBadge, { borderColor: concurso.accentColor + '55' }]}>
-                <Text style={[styles.siglaText, { color: concurso.accentColor }]}>
-                  {concurso.sigla}
+            <View style={styles.cardMeta}>
+              <View style={styles.metaTag}>
+                <View style={[styles.metaDot, { backgroundColor: accentColor }]} />
+                <Text variant="labelSmall" style={{ color: onContainerColor, opacity: 0.7 }}>
+                  {concurso.banca}
                 </Text>
               </View>
-              <Text style={styles.cardIcon}>{concurso.icon}</Text>
+              <View style={styles.metaTag}>
+                <View style={[styles.metaDot, { backgroundColor: accentColor }]} />
+                <Text variant="labelSmall" style={{ color: onContainerColor, opacity: 0.7 }}>
+                  {concurso.vagas}
+                </Text>
+              </View>
             </View>
 
-            <View style={styles.cardRight}>
-              <Text style={styles.cardNome}>{concurso.nome}</Text>
-              <Text style={styles.cardCargo}>{concurso.cargo}</Text>
-
-              <View style={styles.cardMeta}>
-                <View style={styles.metaTag}>
-                  <View style={[styles.metaDot, { backgroundColor: concurso.dotColor }]} />
-                  <Text style={styles.metaText}>{concurso.banca}</Text>
-                </View>
-                <View style={styles.metaTag}>
-                  <View style={[styles.metaDot, { backgroundColor: concurso.dotColor }]} />
-                  <Text style={styles.metaText}>{concurso.vagas}</Text>
-                </View>
-              </View>
-
-              <View style={[styles.ctaRow]}>
-                <Text style={[styles.ctaText, { color: concurso.accentColor }]}>
-                  Gerar minha trilha
-                </Text>
-                <Text style={[styles.ctaArrow, { color: concurso.accentColor }]}>→</Text>
-              </View>
+            <View style={styles.ctaRow}>
+              <Text variant="labelLarge" style={{ color: accentColor }}>
+                Gerar minha trilha
+              </Text>
             </View>
           </View>
-        </Pressable>
-      </Animated.View>
+        </Card.Content>
+      </Card>
     </Animated.View>
   );
 }
 
 export default function ConcursosScreen() {
   const insets = useSafeAreaInsets();
+  const theme = useTheme();
 
   return (
-    <View style={[styles.screen, { paddingTop: insets.top }]}>
-      <ScrollView
-        contentContainerStyle={styles.scroll}
-        showsVerticalScrollIndicator={false}
-      >
+    <View
+      style={[styles.screen, { backgroundColor: theme.colors.background, paddingTop: insets.top }]}>
+      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <Animated.View entering={FadeInDown.delay(0).springify()} style={styles.header}>
-          <Text style={styles.brandLabel}>aprova.AI</Text>
-          <Text style={styles.headline}>Qual concurso{'\n'}voce vai passar?</Text>
-          <Text style={styles.subheadline}>
+          <Text variant="labelMedium" style={[styles.brandLabel, { color: theme.colors.primary }]}>
+            APROVA.AI
+          </Text>
+          <Text
+            variant="headlineLarge"
+            style={[styles.headline, { color: theme.colors.onBackground }]}>
+            Qual concurso{'\n'}voce vai passar?
+          </Text>
+          <Text
+            variant="bodyMedium"
+            style={[styles.subheadline, { color: theme.colors.onSurfaceVariant }]}>
             Geramos sua trilha de estudos personalizada a partir do edital oficial.
           </Text>
         </Animated.View>
@@ -146,12 +143,9 @@ export default function ConcursosScreen() {
           ))}
         </View>
 
-        <Animated.View
-          entering={FadeInDown.delay(400).springify()}
-          style={styles.footer}
-        >
-          <View style={styles.footerDivider} />
-          <Text style={styles.footerText}>
+        <Animated.View entering={FadeInDown.delay(400).springify()} style={styles.footer}>
+          <View style={[styles.footerDivider, { backgroundColor: theme.colors.outline }]} />
+          <Text variant="labelSmall" style={{ color: theme.colors.onSurfaceVariant }}>
             Mais concursos chegando em breve
           </Text>
         </Animated.View>
@@ -163,69 +157,39 @@ export default function ConcursosScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#0B0B14',
   },
   scroll: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     paddingBottom: 40,
   },
   header: {
     paddingTop: 32,
-    paddingBottom: 32,
+    paddingBottom: 28,
     gap: 8,
   },
   brandLabel: {
-    fontFamily: 'Nunito_800ExtraBold',
-    fontSize: 13,
     letterSpacing: 2,
-    color: '#6750A4',
-    textTransform: 'uppercase',
     marginBottom: 4,
   },
   headline: {
     fontFamily: 'Nunito_800ExtraBold',
-    fontSize: 34,
     lineHeight: 40,
-    color: '#F0EEFF',
-    letterSpacing: -0.5,
   },
   subheadline: {
-    fontSize: 14,
     lineHeight: 20,
-    color: '#9890B0',
     marginTop: 4,
   },
   list: {
-    gap: 16,
+    gap: 12,
   },
   card: {
-    borderRadius: 20,
-    overflow: 'hidden',
-    minHeight: 160,
-  },
-  blob: {
-    position: 'absolute',
-    width: 180,
-    height: 180,
-    borderRadius: 90,
-    right: -40,
-    top: -40,
-  },
-  accentLine: {
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    bottom: 0,
-    width: 4,
-    borderTopLeftRadius: 20,
-    borderBottomLeftRadius: 20,
+    borderRadius: 16,
   },
   cardContent: {
     flexDirection: 'row',
-    padding: 20,
-    paddingLeft: 24,
     gap: 16,
-    minHeight: 160,
+    paddingVertical: 20,
+    minHeight: 140,
   },
   cardLeft: {
     alignItems: 'center',
@@ -238,11 +202,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 4,
   },
-  siglaText: {
-    fontFamily: 'Nunito_800ExtraBold',
-    fontSize: 13,
-    letterSpacing: 1,
-  },
   cardIcon: {
     fontSize: 36,
   },
@@ -253,14 +212,6 @@ const styles = StyleSheet.create({
   },
   cardNome: {
     fontFamily: 'Nunito_800ExtraBold',
-    fontSize: 22,
-    color: '#F0EEFF',
-    lineHeight: 26,
-  },
-  cardCargo: {
-    fontSize: 12,
-    color: '#9890B0',
-    marginTop: 2,
   },
   cardMeta: {
     flexDirection: 'row',
@@ -277,25 +228,10 @@ const styles = StyleSheet.create({
     height: 5,
     borderRadius: 3,
   },
-  metaText: {
-    fontSize: 11,
-    color: '#9890B0',
-    letterSpacing: 0.3,
-  },
   ctaRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
     marginTop: 12,
-  },
-  ctaText: {
-    fontSize: 13,
-    fontWeight: '700',
-    letterSpacing: 0.2,
-  },
-  ctaArrow: {
-    fontSize: 14,
-    fontWeight: '700',
   },
   footer: {
     marginTop: 32,
@@ -305,11 +241,5 @@ const styles = StyleSheet.create({
   footerDivider: {
     width: 40,
     height: 1,
-    backgroundColor: '#2A2440',
-  },
-  footerText: {
-    fontSize: 12,
-    color: '#4A4460',
-    letterSpacing: 0.5,
   },
 });

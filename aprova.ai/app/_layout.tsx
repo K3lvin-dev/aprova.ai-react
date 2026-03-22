@@ -6,24 +6,26 @@ import { PaperProvider } from 'react-native-paper';
 import { useFonts, Nunito_800ExtraBold } from '@expo-google-fonts/nunito';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { lightTheme, darkTheme } from '@/constants/md3-theme';
+import { Colors } from '@/constants/colors';
 import { initSuperTokens } from '@/lib/supertokens';
 
 initSuperTokens();
 SplashScreen.preventAutoHideAsync();
 
-const APP_BG = '#0B0B14';
+const queryClient = new QueryClient();
 
 const navLightTheme = {
   ...DefaultTheme,
-  colors: { ...DefaultTheme.colors, background: APP_BG },
+  colors: { ...DefaultTheme.colors, background: Colors.background },
 };
 
 const navDarkTheme = {
   ...DarkTheme,
-  colors: { ...DarkTheme.colors, background: APP_BG },
+  colors: { ...DarkTheme.colors, background: Colors.background },
 };
 
 export default function RootLayout() {
@@ -39,11 +41,19 @@ export default function RootLayout() {
   if (!fontsLoaded) return null;
 
   return (
-    <PaperProvider theme={isDark ? darkTheme : lightTheme}>
-      <ThemeProvider value={isDark ? navDarkTheme : navLightTheme}>
-        <Stack screenOptions={{ headerShown: false, animation: 'fade', contentStyle: { backgroundColor: APP_BG } }} />
-        <StatusBar style="light" />
-      </ThemeProvider>
-    </PaperProvider>
+    <QueryClientProvider client={queryClient}>
+      <PaperProvider theme={isDark ? darkTheme : lightTheme}>
+        <ThemeProvider value={isDark ? navDarkTheme : navLightTheme}>
+          <Stack
+            screenOptions={{
+              headerShown: false,
+              animation: 'fade',
+              contentStyle: { backgroundColor: Colors.background },
+            }}
+          />
+          <StatusBar style="light" />
+        </ThemeProvider>
+      </PaperProvider>
+    </QueryClientProvider>
   );
 }

@@ -1,14 +1,13 @@
 import { View, StyleSheet } from 'react-native';
 import { Image } from 'expo-image';
 import { Text } from 'react-native-paper';
+import { Colors } from '@/constants/colors';
 
 export function AuthHero() {
   return (
     <View style={styles.hero}>
       <Image source={require('@/assets/images/logo.svg')} style={styles.logo} />
-      <Text style={styles.brand}>
-        APROVA.AI
-      </Text>
+      <Text style={styles.brand}>APROVA.AI</Text>
     </View>
   );
 }
@@ -31,7 +30,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Nunito_800ExtraBold',
     fontSize: 30,
     letterSpacing: 2,
-    color: '#6750A4',
+    color: Colors.primary,
     textTransform: 'uppercase',
   },
 });

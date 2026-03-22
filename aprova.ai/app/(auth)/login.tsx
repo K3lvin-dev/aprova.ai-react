@@ -7,6 +7,7 @@ import { authApi } from '@/lib/supertokens';
 
 import { AuthHero } from '@/components/auth/auth-hero';
 import { SocialButtons } from '@/components/auth/social-buttons';
+import { Colors } from '@/constants/colors';
 
 type FormData = {
   email: string;
@@ -18,7 +19,11 @@ export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState('');
 
-  const { control, handleSubmit, formState: { errors } } = useForm<FormData>();
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormData>();
   const theme = useTheme();
 
   const onSubmit = async ({ email, password }: FormData) => {
@@ -53,14 +58,12 @@ export default function LoginScreen() {
   return (
     <KeyboardAvoidingView
       style={[styles.flex, styles.screen]}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView
         style={styles.flex}
         contentContainerStyle={styles.scroll}
         keyboardShouldPersistTaps="handled"
-        bounces={false}
-      >
+        bounces={false}>
         <AuthHero />
 
         <View style={styles.body}>
@@ -72,7 +75,9 @@ export default function LoginScreen() {
 
           <View style={styles.dividerRow}>
             <Divider style={styles.divider} />
-            <Text variant="bodyMedium" style={[styles.orText, { color: theme.colors.primary }]}>ou entre com e-mail</Text>
+            <Text variant="bodyMedium" style={[styles.orText, { color: theme.colors.primary }]}>
+              ou entre com e-mail
+            </Text>
             <Divider style={styles.divider} />
           </View>
 
@@ -117,7 +122,7 @@ export default function LoginScreen() {
                   right={
                     <TextInput.Icon
                       icon={showPassword ? 'eye-off' : 'eye'}
-                      onPress={() => setShowPassword(v => !v)}
+                      onPress={() => setShowPassword((v) => !v)}
                     />
                   }
                   value={value}
@@ -137,7 +142,7 @@ export default function LoginScreen() {
             </HelperText>
           ) : null}
 
-          <Button mode="text" onPress={() => { }} style={styles.forgotButton}>
+          <Button mode="text" onPress={() => {}} style={styles.forgotButton}>
             Esqueci minha senha
           </Button>
 
@@ -147,15 +152,18 @@ export default function LoginScreen() {
             loading={loading}
             disabled={loading}
             style={styles.primaryButton}
-            contentStyle={styles.primaryButtonContent}
-          >
+            contentStyle={styles.primaryButtonContent}>
             Entrar
           </Button>
 
           <View style={styles.footer}>
-            <Text variant="bodyLarge" style={{ color: theme.colors.primary }}>Nao tem conta? </Text>
+            <Text variant="bodyLarge" style={{ color: theme.colors.primary }}>
+              Nao tem conta?{' '}
+            </Text>
             <Link href="/(auth)/sign-up">
-              <Text variant="bodyLarge" style={[styles.link, { color: theme.colors.primary }]}>Cadastre-se</Text>
+              <Text variant="bodyLarge" style={[styles.link, { color: theme.colors.primary }]}>
+                Cadastre-se
+              </Text>
             </Link>
           </View>
         </View>
@@ -166,7 +174,7 @@ export default function LoginScreen() {
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
-  screen: { backgroundColor: '#0B0B14' },
+  screen: { backgroundColor: Colors.background },
   scroll: { flexGrow: 1 },
   body: {
     flex: 1,

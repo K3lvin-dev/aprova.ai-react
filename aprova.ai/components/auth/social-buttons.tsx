@@ -16,8 +16,7 @@ export function SocialButtons({ onGooglePress, onApplePress, loading }: Props) {
         onPress={onGooglePress}
         disabled={loading}
         style={styles.button}
-        contentStyle={styles.buttonContent}
-      >
+        contentStyle={styles.buttonContent}>
         Continuar com Google
       </Button>
       <Button
@@ -26,8 +25,7 @@ export function SocialButtons({ onGooglePress, onApplePress, loading }: Props) {
         onPress={onApplePress}
         disabled={loading}
         style={styles.button}
-        contentStyle={styles.buttonContent}
-      >
+        contentStyle={styles.buttonContent}>
         Continuar com Apple
       </Button>
     </View>

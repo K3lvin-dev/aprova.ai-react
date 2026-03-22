@@ -7,6 +7,7 @@ import { authApi } from '@/lib/supertokens';
 
 import { AuthHero } from '@/components/auth/auth-hero';
 import { SocialButtons } from '@/components/auth/social-buttons';
+import { Colors } from '@/constants/colors';
 
 type FormData = {
   name: string;
@@ -20,7 +21,12 @@ export default function SignUpScreen() {
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState('');
 
-  const { control, handleSubmit, watch, formState: { errors } } = useForm<FormData>();
+  const {
+    control,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<FormData>();
   const password = watch('password');
   const theme = useTheme();
 
@@ -32,7 +38,9 @@ export default function SignUpScreen() {
       if (response.status === 'OK') {
         router.replace('/');
       } else if (response.status === 'FIELD_ERROR') {
-        const emailError = response.formFields.find(f => f.id === 'email');
+        const emailError = response.formFields.find(
+          (f: { id: string; error: string }) => f.id === 'email',
+        );
         setApiError(emailError?.error ?? 'Erro ao criar conta.');
       } else {
         setApiError('Erro ao criar conta. Tente novamente.');
@@ -47,26 +55,22 @@ export default function SignUpScreen() {
   return (
     <KeyboardAvoidingView
       style={[styles.flex, styles.screen]}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView
         style={styles.flex}
         contentContainerStyle={styles.scroll}
         keyboardShouldPersistTaps="handled"
-        bounces={false}
-      >
+        bounces={false}>
         <AuthHero />
 
         <View style={styles.body}>
-          <SocialButtons
-            onGooglePress={() => {}}
-            onApplePress={() => {}}
-            loading={loading}
-          />
+          <SocialButtons onGooglePress={() => {}} onApplePress={() => {}} loading={loading} />
 
           <View style={styles.dividerRow}>
             <Divider style={styles.divider} />
-            <Text variant="bodyMedium" style={[styles.orText, { color: theme.colors.primary }]}>ou cadastre com e-mail</Text>
+            <Text variant="bodyMedium" style={[styles.orText, { color: theme.colors.primary }]}>
+              ou cadastre com e-mail
+            </Text>
             <Divider style={styles.divider} />
           </View>
 
@@ -132,7 +136,7 @@ export default function SignUpScreen() {
                   right={
                     <TextInput.Icon
                       icon={showPassword ? 'eye-off' : 'eye'}
-                      onPress={() => setShowPassword(v => !v)}
+                      onPress={() => setShowPassword((v) => !v)}
                     />
                   }
                   value={value}
@@ -151,7 +155,7 @@ export default function SignUpScreen() {
             name="confirmPassword"
             rules={{
               required: 'Confirmacao obrigatoria',
-              validate: v => v === password || 'As senhas nao coincidem',
+              validate: (v) => v === password || 'As senhas nao coincidem',
             }}
             render={({ field: { onChange, value } }) => (
               <>
@@ -182,15 +186,18 @@ export default function SignUpScreen() {
             loading={loading}
             disabled={loading}
             style={styles.primaryButton}
-            contentStyle={styles.primaryButtonContent}
-          >
+            contentStyle={styles.primaryButtonContent}>
             Criar conta
           </Button>
 
           <View style={styles.footer}>
-            <Text variant="bodyLarge" style={{ color: theme.colors.primary }}>Ja tem conta? </Text>
+            <Text variant="bodyLarge" style={{ color: theme.colors.primary }}>
+              Ja tem conta?{' '}
+            </Text>
             <Link href="/(auth)/login">
-              <Text variant="bodyLarge" style={[styles.link, { color: theme.colors.primary }]}>Entrar</Text>
+              <Text variant="bodyLarge" style={[styles.link, { color: theme.colors.primary }]}>
+                Entrar
+              </Text>
             </Link>
           </View>
         </View>
@@ -201,7 +208,7 @@ export default function SignUpScreen() {
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
-  screen: { backgroundColor: '#0B0B14' },
+  screen: { backgroundColor: Colors.background },
   scroll: { flexGrow: 1 },
   body: {
     flex: 1,
