@@ -254,4 +254,6 @@ buck-out/
 .buckversion
 .fakebuckversion
 
+adb.exe
+
 # End of https://www.toptal.com/developers/gitignore/api/reactnative
